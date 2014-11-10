@@ -1,3 +1,4 @@
 ##Ignore backup files files
 *.R~
 *.R\#
+.Rproj.user
