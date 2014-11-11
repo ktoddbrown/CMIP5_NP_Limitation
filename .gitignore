@@ -1,5 +1,11 @@
 ##Ignore backup files files
 *.R~
 *.R\#
+.Rhistory
 .Rproj.user
 CMIP5_NP_Limitation.Rproj
+
+##Ignore local files
+data/*
+fig/*
+output/*
