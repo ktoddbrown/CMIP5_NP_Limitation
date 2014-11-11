@@ -28,11 +28,15 @@
 library('ncdf4')
 source('lib/rasterToArray.R')
 
+#nutrientDir <- 'nutrientMaps/'
+nutrientDir <- '/Volumes/DATAFILES/anuNCDF/ncarTransfer'
+
 ###############################
 ##Load the biome mask
 ###############################
 cat('loading biome mask...')
-biomeMask <- raster('nutrientMaps/MOD12Q1_fill_1dgr.nc') #12 is Agg, 13 urban
+#biomeMask <- raster('nutrientMaps/MOD12Q1_fill_1dgr.nc') #12 is Agg, 13 urban
+biomeMask <- raster(sprintf('%s/MOD12Q1_fill_1dgr.nc', nutrientDir))
 extent(biomeMask) <- c(-180, 180, -90, 90)
 res(biomeMask) <- c(1,1)
 biomeMask <- rasterToArray(biomeMask)
@@ -91,7 +95,7 @@ CtoP <- biomeMask
 CtoNsoil <- biomeMask
 
 ##plot the biome maps and generate the C:N, C:P, and soils C:N maps
-png('biomeMap.png', height=4*300, width=4*400)
+png('fig/biomeMap.png', height=4*300, width=4*400)
 par(mfrow=c(4,4))
 for(ii in unique(as.vector(biomeMask))){
     if(is.na(ii)) next;
@@ -110,7 +114,8 @@ cat('loading N|P new NPP, N|P input rates, land area, and associated year. (Igno
 ################################################
 ##Load nutrient supported new NPP for each year
 ################################################
-data.nc <- nc_open('nutrientMaps/ann_Input_data.nc')
+#data.nc <- nc_open('nutrientMaps/ann_Input_data.nc')
+data.nc <- nc_open(sprintf('%s/ann_Input_data.nc', nutrientDir))
 
 NnewNPP <- ncvar_get(data.nc, varid='input_npp_N')
 ##set the NA values
@@ -148,6 +153,39 @@ cat('done\n')
 cat('calculating global totals...')
 NIn_tot <- apply(NInRate, c(3), function(x){sum(as.vector(x*landarea)[is.finite(x)], na.rm=TRUE)})/1e12
 PIn_tot <- apply(PInRate, c(3), function(x){sum(as.vector(x*landarea)[is.finite(x)], na.rm=TRUE)})/1e12
-newNNPP_tot <- apply(NnewNPP, c(3), function(x){sum(as.vector(x*landarea)[is.finite(x)], na.rm=TRUE)})/1e12
-newPNPP_tot <- apply(PnewNPP, c(3), function(x){sum(as.vector(x*landarea)[is.finite(x)], na.rm=TRUE)})/1e12
+cat('done\n')
+
+##Record the total annual addition supported by N and P
+cat('finding annual N and P supported NPP...')
+NnewNPP_tot <-  apply(NnewNPP, c(3), function(x){sum(as.vector(x*landarea)[is.finite(x)], na.rm=TRUE)})/1e12
+PnewNPP_tot <-  apply(PnewNPP, c(3), function(x){sum(as.vector(x*landarea)[is.finite(x)], na.rm=TRUE)})/1e12
+cat('making figures...')
+#pdf('fig/FinalN.pdf', height=3, width=5)
+png('fig/FinalN.png', height=300, width=500)
+world.plot(1:360, -90:89, NInRate[,,251]*1e3, title='Total New N [g m^2]')
+dev.off()
+#pdf('fig/FinalP.pdf', height=3, width=5)
+png('fig/FinalP.png', height=300, width=500)
+world.plot(1:360, -90:89, PInRate[,,251]*1e3, title='Total New P [g m^2]')
+dev.off()
+##Record the total annual addition supported by N and P
+cat('finding annual N and P supported NPP...')
+NnewNPP_tot <-  apply(NnewNPP, c(3), function(x){sum(as.vector(x*landarea)[is.finite(x)], na.rm=TRUE)})/1e12
+PnewNPP_tot <-  apply(PnewNPP, c(3), function(x){sum(as.vector(x*landarea)[is.finite(x)], na.rm=TRUE)})/1e12
+cat('making figures...')
+#pdf('fig/FinalN.pdf', height=3, width=5)
+png('fig/FinalN.png', height=300, width=500)
+world.plot(1:360, -90:89, NInRate[,,251]*1e3, title='Total New N [g m^2]')
+dev.off()
+#pdf('fig/FinalP.pdf', height=3, width=5)
+png('fig/FinalP.png', height=300, width=500)
+world.plot(1:360, -90:89, PInRate[,,251]*1e3, title='Total New P [g m^2]')
+dev.off()
+
+pdf('fig/cumulativeN.pdf', height=3, width=5)
+plot(yr, NIn_tot, xlab='', ylab='Pg', main='Cumulative global new N', type='l')
+dev.off()
+pdf('fig/cumulativeP.pdf', height=3, width=5)
+plot(yr, PIn_tot, xlab='', ylab='Pg', main='Cumulative global new P', type='l')
+dev.off()
 cat('done\n')
