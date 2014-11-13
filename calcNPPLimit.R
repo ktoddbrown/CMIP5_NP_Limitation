@@ -26,16 +26,19 @@ library('abind')
 source('lib/world.plot.R') #plot the maps nicely
 source('lib/rasterToArray.R') #convert raster files to our array format
 
-loadPrevious <- FALSE #Do we build off of previous runs?
+loadPrevious <- TRUE #Do we build off of previous runs?
 
 ##Where is everything located this will change
 #CMIPDir <- '/Volumes/DATAFILES/downloads'
 #anuRstDir <- '/Volumes/DATAFILES/anuNCDF'
 CMIPDir <- '/Volumnes/DATAFILES/anuNCDF/ncarTransfer'
 anuRstDir <- CMIPDir
-
-for(boundStr in c('', 'lower', 'upper')[2:3]){
-  boundSD <- 0.1 #relative lower bound on new N, new P, C:N, and C:P estimates
+for(halfStr in c('', 'In', 'Ratio')){
+for(boundStr in c('mean', 'lower', 'upper')){
+  
+  source('lib/loadBiomeConst.R')
+  
+  boundSD <- 0.2 #relative lower bound on new N, new P, C:N, and C:P estimates
   
   if(boundStr %in% 'lower'){
     cat('Processing lower bound\n')
@@ -48,20 +51,33 @@ for(boundStr in c('', 'lower', 'upper')[2:3]){
     boundSD <- 0
   }
   
-  source('lib/loadBiomeConst.R')
   
+  if(halfStr %in% c('', 'In')){
   #To find the maximum raise the inputs 
-  NInRate <- NInRate*(1+boundSD)
-  PInRate <- PInRate*(1+boundSD)
-  #...and the required C/N or C/P ratio
-  CtoN <- CtoN*(1+boundSD)
-  CtoP <- CtoP*(1+boundSD)
-  CtoNsoil <- CtoNsoil*(1+boundSD)
+    cat('reducing Inputs\n')
+    NInRate <- NInRate*(1+boundSD)
+    PInRate <- PInRate*(1+boundSD)
+  }
   
+  if(halfStr %in% c('', 'Ratio')){
+  #...and the required C/N or C/P ratio
+    cat('reducing Ratio\n')
+    CtoN <- CtoN*(1+boundSD)
+    CtoP <- CtoP*(1+boundSD)
+    CtoNsoil <- CtoNsoil*(1+boundSD)
+  }
+  
+  boundStr <- sprintf('%s%s', boundStr, halfStr)
+
   #are we constraining based on N, P or NP, anything else will be a test run where NPP is unconstrained
-  for(limitStr in c('N', 'P', 'NP')[c(3)]){
+  for(limitStr in c('N', 'P', 'NP')[c(1,3)]){
     #Do we add N lost from the soil to the NPP N pool?
-    for(addSoilN in c(TRUE, FALSE)[1]){
+    if(!(boundStr %in% 'lower')){
+      addSoilNarr <- c(TRUE, FALSE)
+    }else{
+      addSoilNarr <- c(FALSE)
+    }
+    for(addSoilN in addSoilNarr){
       
       ##Intialize the variables we will save
       orginalTot <- NULL ##orginal global totals
@@ -71,7 +87,7 @@ for(boundStr in c('', 'lower', 'upper')[2:3]){
       endMaps <- list() ##2090's maps
       
       if(addSoilN){
-        cat('Adding N back into the soil\n')
+        cat('Adding soil N back\n')
       }else{
         cat('No added N into the soil\n')
       }
@@ -83,7 +99,7 @@ for(boundStr in c('', 'lower', 'upper')[2:3]){
       }
       
       ##Models we are running
-      modelToConsider <- c( "bcc-csm1-1-m", "BNU-ESM", "CanESM2", "CESM1-BGC", "GFDL-ESM2G", "HadGEM2-ES", "inmcm4", "IPSL-CM5A-MR", "MIROC-ESM", "MPI-ESM-MR", "NorESM1-M")[1]#, "NorESM1-ME") #what models are we using?
+      modelToConsider <- c( "bcc-csm1-1-m", "BNU-ESM", "CanESM2", "CESM1-BGC", "GFDL-ESM2G", "HadGEM2-ES", "inmcm4", "IPSL-CM5A-MR", "MIROC-ESM", "MPI-ESM-MR", "NorESM1-M")#, "NorESM1-ME") #what models are we using?
       
       ##If we build off of pervious runs then load those here
       if(loadPrevious & file.exists(saveFilename)){
@@ -92,8 +108,6 @@ for(boundStr in c('', 'lower', 'upper')[2:3]){
       
       ##Save reloading time when we are debugging the code
       currentModelStr <- NA
-      
-      cat('flag1 [', modelStr, ']\n')
       
       if('modelStr' %in% ls()){
         currentModelStr <- modelStr
@@ -393,7 +407,7 @@ for(boundStr in c('', 'lower', 'upper')[2:3]){
                                     adjcSoil=apply(newSoil[,,endFlag], c(1,2), mean, na.rm=TRUE),
                                     adjcVeg=apply(newVeg[,,endFlag], c(1,2), mean, na.rm=TRUE))
         
-        save(file=saveFilename, orginalTot, adjustedTot, startMaps, modernMaps, endMaps)
+        save(file=saveFilename, orginalTot, adjustedTot, startMaps, modernMaps, endMaps, boundSD)
       } #for-loop modelStr
       
       
@@ -401,5 +415,5 @@ for(boundStr in c('', 'lower', 'upper')[2:3]){
     } #for-loop addSoilN
   } #for-loop limitStr
 } #for-loop bondStr
-
+}#for-loop halfStr
 source('writeNPPLimitSummary.R')
