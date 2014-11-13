@@ -13,6 +13,43 @@ library('ncdf4')
 ##Where are we sticking the output directory
 dirname <- 'output'
 
+strKey <- list(no=FALSE, with=TRUE)
+allTotals <- NULL
+##Write csv files of totals/means
+for(loadFilename in list.files('data/')){
+  boundStr <- gsub('(.*)NP?_.*', '\\1', loadFilename)
+  if(boundStr %in% '') boundStr <- 'mean'
+
+  nutrientStr <- gsub('.*(NP?)_.*', '\\1', loadFilename)
+  soilNStr <- gsub('.*_(.*)Csn.*', '\\1', loadFilename)
+  
+  load(sprintf('data/%s', loadFilename))
+  adjustedTot <- data.frame(bound=boundStr, nutrient=nutrientStr,
+                            soilNReturn=strKey[[soilNStr]], adjustedTot)
+  row.names(adjustedTot) <- NULL
+  if(is.null(allTotals)){
+    allTotals <- adjustedTot
+  }else{
+    allTotals <- merge(allTotals, adjustedTot, all=TRUE)
+  }
+  
+}
+##Write the annual totals  
+cat('writing nutrient limited global totals...')
+write.csv(file='output/limittedTot.csv', allTotals)
+cat('done\n')
+cat('writing orginal global totals...')
+write.csv(file='output/orginalTot.csv', orginalTot)
+error()
+
+##Example script to analyse means/sd
+adjMeans <- aggregate(allTotals[,grepl('^X\\d', names(allTotals))], by=allTotals[,c('bound', 'nutrient', 'soilNReturn','var' )], mean, na.rm=TRUE)
+orgMeans <- aggregate(orginalTot[,grepl('^X\\d', names(orginalTot))], by=list(var=orginalTot$var), mean, na.rm=TRUE)
+meansdf <- merge(orgMeans, adjMeans, all=TRUE)
+meansdf[meansdf$var %in% 'veg',c('bound', 'nutrient', 'soilNReturn', 'X1860.12', 'X2005.12', 'X2099.12')]
+
+## write netcdf files:
+
 ##Name of the nc variables by variable name
 ncNames <- list(npp='ESM NPP', cSoil='ESM cSoil+', cVeg='ESM cVeg+',
                 adjnpp='Limited NPP', adjcSoil='Limited cSoil+',
@@ -51,14 +88,7 @@ for(addSoilN in c(TRUE, FALSE)){
         ##load from this command in calcNPPLimite.R:
         ##save(file=saveFilename, orginalTot, adjustedTot,
         ##                        startMaps, modernMaps, endMaps)
-        load(loadFilename)
-
-        ##Write the annual totals
-        cat('writing orginal global totals...')
-        write.csv(file=sprintf('%s/orginalTot.csv', dirname), orginalTot)
-        cat('writing nutrient limited global totals...')
-        write.csv(file=totFilename, adjustedTot)
-        cat('done\n')
+        
 
         ##Go through each model and save the netcdf4 file format
         for(modelStr in unique(names(startMaps))){
