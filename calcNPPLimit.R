@@ -33,24 +33,28 @@ loadPrevious <- TRUE #Do we build off of previous runs?
 #anuRstDir <- '/Volumes/DATAFILES/anuNCDF'
 CMIPDir <- '/Volumnes/DATAFILES/anuNCDF/ncarTransfer'
 anuRstDir <- CMIPDir
-for(halfStr in c('', 'In', 'Ratio')){
+
 for(boundStr in c('mean', 'lower', 'upper')){
-  
-  source('lib/loadBiomeConst.R')
-  
+
   boundSD <- 0.2 #relative lower bound on new N, new P, C:N, and C:P estimates
   
   if(boundStr %in% 'lower'){
     cat('Processing lower bound\n')
     boundSD <- -1*boundSD
+    halfStrArr <- c('', 'In', 'Ratio')
   }else if(boundStr %in% 'upper'){
     cat('Processing upper bound\n')
     boundSD <- boundSD
-  } else {#otherwise don't do anything
+    halfStrArr <- c('', 'In', 'Ratio')
+    } else {#otherwise don't do anything
     cat('Processing mean\n')
     boundSD <- 0
+    halfStrArr <- c('')
   }
   
+  for(halfStr in halfStrArr){
+    
+  source('lib/loadBiomeConst.R')
   
   if(halfStr %in% c('', 'In')){
   #To find the maximum raise the inputs 
@@ -70,12 +74,12 @@ for(boundStr in c('mean', 'lower', 'upper')){
   boundStr <- sprintf('%s%s', boundStr, halfStr)
 
   #are we constraining based on N, P or NP, anything else will be a test run where NPP is unconstrained
-  for(limitStr in c('N', 'P', 'NP')[c(1,3)]){
+  for(limitStr in c('N', 'P', 'NP')){
     #Do we add N lost from the soil to the NPP N pool?
-    if(!(boundStr %in% 'lower')){
-      addSoilNarr <- c(TRUE, FALSE)
-    }else{
+    if(boundStr %in% 'lower' | limitStr %in% 'P'){
       addSoilNarr <- c(FALSE)
+    }else{
+      addSoilNarr <- c(TRUE, FALSE)
     }
     for(addSoilN in addSoilNarr){
       
@@ -92,11 +96,8 @@ for(boundStr in c('mean', 'lower', 'upper')){
         cat('No added N into the soil\n')
       }
       ##Pick the save file name intellegently
-      if(limitStr %in% 'P'){
-        saveFilename <- sprintf('data/%s%scalcNPPLimit.RData', boundStr, limitStr)
-      }else{
-        saveFilename <- sprintf('data/%s%s%scalcNPPLimit.RData', boundStr, limitStr, c('_withCsn', '_noCsn')[c(addSoilN, !addSoilN)])
-      }
+      saveFilename <- sprintf('data/%s%s%scalcNPPLimit.RData', boundStr, limitStr, c('_withCsn', '_noCsn')[c(addSoilN, !addSoilN)])
+      
       
       ##Models we are running
       modelToConsider <- c( "bcc-csm1-1-m", "BNU-ESM", "CanESM2", "CESM1-BGC", "GFDL-ESM2G", "HadGEM2-ES", "inmcm4", "IPSL-CM5A-MR", "MIROC-ESM", "MPI-ESM-MR", "NorESM1-M")#, "NorESM1-ME") #what models are we using?
@@ -122,7 +123,7 @@ for(boundStr in c('mean', 'lower', 'upper')){
         ## Load model variables
         ## ####################################
         
-        if(!(currentModelStr %in% modelStr)){
+        if(is.null(currentModelStr) || !(currentModelStr %in% modelStr)) {
           ##Loadd the 1x1 degree merge of historcal and rcp85
           commonStr <- '_commmon'
           
