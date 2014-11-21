@@ -146,23 +146,15 @@ lat <- (lat[2:length(lat)]+lat[(2:length(lat))-1])/2
 
 cat('done\n')
 
-cat('trimming and aggrigating...')
-for(varStr in varStrArr){
+for(varStr in  varStrArr){
     if(varStr %in% ls() && eval(parse(text=sprintf('!is.null(%s)', varStr)))){
         eval(parse(text=sprintf('%s <- %s[,,yrStr.%s %%in%% yrStr]', varStr, varStr, varStr)))
         eval(parse(text=sprintf('yrStr.%s <- yrStr.%s[yrStr.%s %%in%% yrStr]',
                    varStr, varStr, varStr)))
-        if(varStr %in% c('tsl10')){
-            ##take the area weighted mean for temperature
-            eval(parse(text=sprintf('%s_tot <- apply(%s, c(3), function(x){weighted.mean(x=as.vector(x), w=as.vector(landarea*(is.finite(as.vector(cSoil[,,1])))), na.rm=TRUE)})', varStr, varStr)))
-        }else{
-            ##otherwise take the area weighted sum
-            eval(parse(text=sprintf('%s_tot <- apply(%s, c(3), function(x){sum(as.vector(x*landarea), na.rm=TRUE)})/1e12', varStr, varStr)))
-        }
     }
 }
+
 if('rh' %in% varStrArr && 'cSoil' %in% varStrArr){
-    k_tot <- rh_tot/cSoil_tot
     k <- rh/cSoil
     k[!is.finite(k)] <- NA
     yrStr.k <- yrStr.rh
@@ -171,11 +163,12 @@ if('rh' %in% varStrArr && 'cSoil' %in% varStrArr){
 cat('calculating dC...')
 if('cSoil' %in% ls()){
     dCs <- abind(cSoil[,,2:(dim(cSoil)[3])] - cSoil[,,(2:(dim(cSoil)[3])) - 1], array(NA, dim(landarea)), along=3)
-    dCs_tot <- apply(dCs, c(3), function(x){sum(as.vector(x*landarea), na.rm=TRUE)})/1e12
+    yrStr.dCs <- yrStr.cSoil
 }
 if('cVeg' %in% ls()){
     dCv <-  abind(cVeg[,,2:(dim(cSoil)[3])] - cVeg[,,(2:(dim(cSoil)[3])) - 1], array(NA, dim(landarea)), along=3)
-    dCv_tot <- apply(dCv, c(3), function(x){sum(as.vector(x*landarea), na.rm=TRUE)})/1e12
+    yrStr.dCv <- yrStr.cVeg
 }
 
 cat('done\n')
+
