@@ -40,107 +40,90 @@ write.csv(file='output/limittedTot.csv', allTotals)
 cat('done\n')
 cat('writing orginal global totals...')
 write.csv(file='output/orginalTot.csv', orginalTot)
-error()
 
 ##Example script to analyse means/sd
 adjMeans <- aggregate(allTotals[,grepl('^X\\d', names(allTotals))], by=allTotals[,c('bound', 'nutrient', 'soilNReturn','var' )], mean, na.rm=TRUE)
 orgMeans <- aggregate(orginalTot[,grepl('^X\\d', names(orginalTot))], by=list(var=orginalTot$var), mean, na.rm=TRUE)
 meansdf <- merge(orgMeans, adjMeans, all=TRUE)
-meansdf[meansdf$var %in% 'veg',c('bound', 'nutrient', 'soilNReturn', 'X1860.12', 'X2005.12', 'X2099.12')]
+print(meansdf[meansdf$var %in% 'cLand',c('bound', 'nutrient', 'soilNReturn', 'X1860.12', 'X2005.12', 'X2099.12')])
 
 ## write netcdf files:
 
 ##Name of the nc variables by variable name
-ncNames <- list(npp='ESM NPP', cSoil='ESM cSoil+', cVeg='ESM cVeg+',
-                adjnpp='Limited NPP', adjcSoil='Limited cSoil+',
-                adjcVeg='Limited cVeg+')
+ncNames <- list(NPP='ESM NPP', cSoil='ESM cSoil+', cVeg='ESM cVeg+', Rh='ESM Rh',
+                adjNPP='Limited NPP', adjRh='Limited Rh',
+                adjcSoil='Limited cSoil+', adjcVeg='Limited cVeg+')
 
 ##Units of nc variables by variable name
-ncUnits <- list(npp='kg m^-2 yr^-1', cSoil='kg m^-2', cVeg='kg m^-2',
-                adjnpp='kg m^-2 yr^-1', adjcSoil='kg m^-2',
+ncUnits <- list(NPP='kg m^-2 yr^-1', cSoil='kg m^-2', cVeg='kg m^-2', Rh='kg m^-2 yr^-1',
+                adjNPP='kg m^-2 yr^-1', adjRh='kg m^-2 yr^-1',
+                adjcSoil='kg m^-2',
                 adjcVeg='kg m^-2')
 
+loadFileArr <- c('data/meanN_withCsncalcNPPLimit.RData',
+                 'data/meanNP_withCsncalcNPPLimit.RData')
+saveFileArr <- c('output/CMIP5/meanN_withCsncalcNPPLimit',
+                 'output/CMIP5/meanNP_withCsncalcNPPLimit')
+orgSaveFilename <- 'output/CMIP5/'
 ##Go through for the added and nonadded soil N
-for(addSoilN in c(TRUE, FALSE)){
+for(fileIndex in 1:2){
+    loadFilename <- loadFileArr[fileIndex]
+    saveFilename <- saveFileArr[fileIndex]
 
-    ##Go through the nutrient limitation type
-    limitToConsider <-  c('N', 'P', 'NP')[c(1,3)]
-    for(limitStr in limitToConsider){
-        ##Pick the save file name intellegently
-        if(limitStr %in% 'P' & !addSoilN){
-            ##There is no P limitation with added soil N, skip it
-            next
-        }
+    cat('loading file [', loadFilename, ']\n')
+    load(loadFilename)
 
-        ##pull the correct load file and set up the figures
-        if(limitStr %in% 'P'){
-            loadFilename <- sprintf('data/%scalcNPPLimit.RData', limitStr)
-            figID <- 'P'
-            totFilename <- sprintf('%s/%s_limitedTot.csv', dirname, limitStr)
-        }else{
-            loadFilename <- sprintf('data/%s%scalcNPPLimit.RData', limitStr, c('_withCsn', '_noCsn')[c(addSoilN, !addSoilN)])
-            figID <- sprintf('%s%s', limitStr, c('_withCn', '')[c(addSoilN, !addSoilN)])
-            totFilename <- sprintf('%s/%s%s_limitedTot.csv', dirname, limitStr, c('_withCn', '')[c(addSoilN, !addSoilN)])
-        }
+    ##Go through each model and save the netcdf4 file format
+    for(modelStr in unique(names(startMaps))){
+        cat(modelStr, '... constructing lon...')
+        numLon <- dim(startMaps[[modelStr]]$NPP)[1]
+        deltaLon <- 360/numLon
+        cat('constructing lat...')
+        numLat <- dim(startMaps[[modelStr]]$NPP)[2]
+        deltaLat <- 180/numLat
 
-        cat('loading file [', loadFilename, ']\n')
+        cat('set up ncdf...')
+        ncdim_lon <- ncdim_def('lon', 'degree', seq(0, 360-deltaLon, length=numLon) + deltaLon/2)
+        ncdim_lat <- ncdim_def('lat', 'degree', seq(-90, 90-deltaLat, length=numLat)+deltaLat/2)
+        cat('done\n')
 
-        ##load from this command in calcNPPLimite.R:
-        ##save(file=saveFilename, orginalTot, adjustedTot,
-        ##                        startMaps, modernMaps, endMaps)
+        ##go through the fluxes and carbon stocks
+        for(varName in names(ncNames)){
+            ##Define the maps
+            ncvar <- ncvar_def(ncNames[[varName]],
+                               ncUnits[[varName]],
+                               list(ncdim_lon, ncdim_lat), NA)
 
-
-        ##Go through each model and save the netcdf4 file format
-        for(modelStr in unique(names(startMaps))){
-            cat(modelStr, '... constructing lon...')
-            numLon <- dim(startMaps[[modelStr]]$npp)[1]
-            deltaLon <- 360/numLon
-            cat('constructing lat...')
-            numLat <- dim(startMaps[[modelStr]]$npp)[2]
-            deltaLat <- 180/numLat
-
-            cat('set up ncdf...')
-            ncdim_lon <- ncdim_def('lon', 'degree', seq(0, 360-deltaLon, length=numLon) + deltaLon/2)
-            ncdim_lat <- ncdim_def('lat', 'degree', seq(-90, 90-deltaLat, length=numLat)+deltaLat/2)
-            cat('done\n')
-
-            ##go through the fluxes and carbon stocks
-            for(varName in names(ncNames)){
-                ##Define the maps
-                ncvar <- ncvar_def(ncNames[[varName]],
-                                   ncUnits[[varName]],
-                                   list(ncdim_lon, ncdim_lat), NA)
-
-                ##Get the base string for the netcdf file name
-                if(grepl('adj', varName)){
-                    savefilebase <- sprintf('%s/%s_%s_%s_', dirname, figID, modelStr, varName)
-                }else{
-                    savefilebase <- sprintf('%s/%s_%s_', dirname,  modelStr, varName)
-                }
-
-                ##Go through the start, modern, and final 10-yr mean maps and
-                ##...write the netcdf files
-                cat('write variable [',varName,']...')
-                cat('start...')
-                data.nc <- nc_create(sprintf('%s_start.nc', savefilebase), ncvar)
-                ncvar_put(data.nc, ncvar, startMaps[[modelStr]][[varName]])
-                nc_close(data.nc)
-
-                cat('modern...')
-                data.nc <- nc_create(sprintf('%s_modern.nc', savefilebase), ncvar)
-                if(varName %in% 'adjnpp'){
-                    ncvar_put(data.nc, ncvar, modernMaps[[modelStr]]$adjNPP)
-                }else{
-                    ncvar_put(data.nc, ncvar, modernMaps[[modelStr]][[varName]])
-                }
-                nc_close(data.nc)
-
-                cat('end...')
-                data.nc <- nc_create(sprintf('%s_end.nc', savefilebase), ncvar)
-                ncvar_put(data.nc, ncvar, endMaps[[modelStr]][[varName]])
-                nc_close(data.nc)
-                cat('done\n')
+            ##Get the base string for the netcdf file name
+            if(grepl('adj', varName)){
+                savefilebase <- sprintf('%s_%s_%s', saveFilename, modelStr, varName)
+            }else{
+                savefilebase <- sprintf('%s%s_%s', orgSaveFilename,  modelStr, varName)
             }
+
+            ##Go through the start, modern, and final 10-yr mean maps and
+            ##...write the netcdf files
+            cat('write variable [',varName,']...')
+            cat('start...')
+            data.nc <- nc_create(sprintf('%s_start.nc', savefilebase), ncvar)
+            ncvar_put(data.nc, ncvar, startMaps[[modelStr]][[varName]])
+            nc_close(data.nc)
+
+            cat('modern...')
+            data.nc <- nc_create(sprintf('%s_modern.nc', savefilebase), ncvar)
+            if(varName %in% 'adjnpp'){
+                ncvar_put(data.nc, ncvar, modernMaps[[modelStr]]$adjNPP)
+            }else{
+                ncvar_put(data.nc, ncvar, modernMaps[[modelStr]][[varName]])
+            }
+            nc_close(data.nc)
+
+            cat('end...')
+            data.nc <- nc_create(sprintf('%s_end.nc', savefilebase), ncvar)
+            ncvar_put(data.nc, ncvar, endMaps[[modelStr]][[varName]])
+            nc_close(data.nc)
+            cat('done\n')
         }
     }
 }
+
