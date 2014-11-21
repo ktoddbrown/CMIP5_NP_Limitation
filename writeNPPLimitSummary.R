@@ -16,13 +16,13 @@ dirname <- 'output'
 strKey <- list(no=FALSE, with=TRUE)
 allTotals <- NULL
 ##Write csv files of totals/means
-for(loadFilename in list.files('data/')){
+for(loadFilename in list.files('data/', pattern='*.RData')){
   boundStr <- gsub('(.*)NP?_.*', '\\1', loadFilename)
   if(boundStr %in% '') boundStr <- 'mean'
 
   nutrientStr <- gsub('.*(NP?)_.*', '\\1', loadFilename)
   soilNStr <- gsub('.*_(.*)Csn.*', '\\1', loadFilename)
-  
+
   load(sprintf('data/%s', loadFilename))
   adjustedTot <- data.frame(bound=boundStr, nutrient=nutrientStr,
                             soilNReturn=strKey[[soilNStr]], adjustedTot)
@@ -32,9 +32,9 @@ for(loadFilename in list.files('data/')){
   }else{
     allTotals <- merge(allTotals, adjustedTot, all=TRUE)
   }
-  
+
 }
-##Write the annual totals  
+##Write the annual totals
 cat('writing nutrient limited global totals...')
 write.csv(file='output/limittedTot.csv', allTotals)
 cat('done\n')
@@ -88,7 +88,7 @@ for(addSoilN in c(TRUE, FALSE)){
         ##load from this command in calcNPPLimite.R:
         ##save(file=saveFilename, orginalTot, adjustedTot,
         ##                        startMaps, modernMaps, endMaps)
-        
+
 
         ##Go through each model and save the netcdf4 file format
         for(modelStr in unique(names(startMaps))){
