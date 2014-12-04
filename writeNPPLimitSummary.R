@@ -60,10 +60,10 @@ ncUnits <- list(NPP='kg m^-2 yr^-1', cSoil='kg m^-2', cVeg='kg m^-2', Rh='kg m^-
                 adjcSoil='kg m^-2',
                 adjcVeg='kg m^-2')
 
-loadFileArr <- c('data/meanN_withCsncalcNPPLimit.RData',
-                 'data/meanNP_withCsncalcNPPLimit.RData')
-saveFileArr <- c('output/CMIP5/meanN_withCsncalcNPPLimit',
-                 'output/CMIP5/meanNP_withCsncalcNPPLimit')
+loadFileArr <- c('data/meanN_noCsncalcNPPLimit.RData',
+                 'data/meanNP_noCsncalcNPPLimit.RData')
+saveFileArr <- c('output/CMIP5/meanN_noCsncalcNPPLimit',
+                 'output/CMIP5/meanNP_noCsncalcNPPLimit')
 orgSaveFilename <- 'output/CMIP5/'
 ##Go through for the added and nonadded soil N
 for(fileIndex in 1:2){
