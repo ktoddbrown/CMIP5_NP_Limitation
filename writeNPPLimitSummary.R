@@ -46,7 +46,7 @@ adjMeans <- aggregate(allTotals[,grepl('^X\\d', names(allTotals))], by=allTotals
 orgMeans <- aggregate(orginalTot[,grepl('^X\\d', names(orginalTot))], by=list(var=orginalTot$var), mean, na.rm=TRUE)
 meansdf <- merge(orgMeans, adjMeans, all=TRUE)
 print(meansdf[meansdf$var %in% 'cLand',c('bound', 'nutrient', 'soilNReturn', 'X1860.12', 'X2005.12', 'X2099.12')])
-
+#error()
 ## write netcdf files:
 
 ##Name of the nc variables by variable name
