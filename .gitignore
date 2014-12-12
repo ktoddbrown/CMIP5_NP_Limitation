@@ -9,5 +9,6 @@ CMIP5_NP_Limitation.Rproj
 data/*
 fig/*
 output/*
+20141206data/*
 
 .RData
