@@ -35,15 +35,15 @@ correctK <- TRUE
 CMIPDir <- '/Volumnes/DATAFILES/anuNCDF/ncarTransfer'
 anuRstDir <- CMIPDir
 
-for(boundStr in c('mean', 'lower', 'upper')){
+for(boundBaseStr in c('mean', 'lower', 'upper')){
 
   boundSD <- 0.2 #relative lower bound on new N, new P, C:N, and C:P estimates
 
-  if(boundStr %in% 'lower'){
+  if(boundBaseStr %in% 'lower'){
     cat('Processing lower bound\n')
     boundSD <- -1*boundSD
     halfStrArr <- c('', 'In', 'Ratio')
-  }else if(boundStr %in% 'upper'){
+  }else if(boundBaseStr %in% 'upper'){
     cat('Processing upper bound\n')
     boundSD <- boundSD
     halfStrArr <- c('', 'In', 'Ratio')
@@ -55,32 +55,34 @@ for(boundStr in c('mean', 'lower', 'upper')){
 
   for(halfStr in halfStrArr){
 
-  source('lib/loadBiomeConst.R')
+      source('lib/loadBiomeConst.R')
 
-  if(halfStr %in% c('', 'In')){
-  #To find the maximum raise the inputs
-    cat('reducing Inputs\n')
-    NInRate <- NInRate*(1+boundSD)
-    PInRate <- PInRate*(1+boundSD)
-  }
+      if(halfStr %in% c('', 'In')){
+           #To find the maximum raise the inputs
+          cat('reducing Inputs\n')
+          NInRate <- NInRate*(1+boundSD)
+          PInRate <- PInRate*(1+boundSD)
+          boundStr <- sprintf('%s%s', boundBaseStr, halfStr)
+      }
 
-  if(halfStr %in% c('', 'Ratio')){
-  #...and the required C/N or C/P ratio
-    cat('reducing Ratio\n')
-    CtoN <- CtoN*(1+boundSD)
-    CtoP <- CtoP*(1+boundSD)
-    CtoNsoil <- CtoNsoil*(1+boundSD)
-  }
+      if(halfStr %in% c('', 'Ratio')){
+          ##...and the required C/N or C/P ratio
+          cat('reducing Ratio\n')
+          CtoN <- CtoN*(1+boundSD)
+          CtoP <- CtoP*(1+boundSD)
+          CtoNsoil <- CtoNsoil*(1+boundSD)
+          boundStr <- sprintf('%s%s', boundBaseStr, halfStr)
+      }
 
-  boundStr <- sprintf('%s%s', boundStr, halfStr)
+
 
   #are we constraining based on N, P or NP, anything else will be a test run where NPP is unconstrained
-  for(limitStr in c('N', 'P', 'NP')[c(1,3)]){
+  for(limitStr in c('N', 'P', 'NP')[c(1, 3)]){
     #Do we add N lost from the soil to the NPP N pool?
-    if(boundStr %in% 'lower' | limitStr %in% 'P'){
+    if(boundBaseStr %in% 'lower' | limitStr %in% 'P'){
       addSoilNarr <- c(FALSE)
     }else{
-      addSoilNarr <- !c(FALSE, TRUE)
+      addSoilNarr <- c(TRUE)#!c(FALSE, TRUE)
     }
     for(addSoilN in addSoilNarr){
 
