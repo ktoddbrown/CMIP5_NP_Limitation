@@ -10,14 +10,16 @@ The purpose of this code base was to impose a nutrient constraint on the land ca
 This repo does not include any datasets used in this study, primarily because these were not a product of this study and can be obtained elsewhere. Included in this repo are the following primary scripts:
 
 1. Python/
-  +NtrInputs_Resampling.py: Generate the nutrient input estimations
+  + NtrInputs_Resampling.py: Generate the nutrient input estimations
 2. R/
-  +calcNPPLimit.R: Main script for imposing post hoc nutrient constraints on the land carbon cycle.
-  +Fig1-S7_Wieder_NatGeo2015.R: Generate figures for the manuscript
+  + calcNPPLimit.R: Main script for imposing post hoc nutrient constraints on the land carbon cycle.
+  + Fig1-S7_Wieder_NatGeo2015.R: Generate figures for the manuscript
 3. NCL/
-  +Fig2_S2-S5_S8-10_Weider.ncl: Generate figures for the manscript
+  + Fig2_S2-S5_S8-10_Weider.ncl: Generate figures for the manscript
 
-**Attributions**: W. Kolby Smith (wkolby@gmail.com) processed the nutrient input estimations. Katherine Todd-Brown (ktoddbrown@gmail.com) processed the CMIP5 simulation outputs. William Wieder (wwieder@ucar.edu) developed the visualizations.
+Earth system model simulation outputs can be downloaded from here: http://cmip-pcmdi.llnl.gov/cmip5/ and processing scripts are in R/lib.
+
+**Attributions**: W. Kolby Smith (wkolby) processed the nutrient input estimations. Katherine Todd-Brown (ktoddbrown) processed the CMIP5 simulation outputs. William Wieder (wwieder) developed the visualizations.
 
 Licence
 -----------------
