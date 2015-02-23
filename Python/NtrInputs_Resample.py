@@ -1,7 +1,16 @@
 '''
 Created on Jul 12, 2013
+Author: William Kolby Smith
 
-@author: bill.smith
+Inputs: 
+1. MODIS Landcover (MOD12Q1) data. Reference: Friedl, M.A. et al. Remote Sens. Environ. 114, 168-182 (2010). 
+2. Nitrogen Fixation data. Reference: Wang, Y.P. & Houlton, B.Z. Geophys. Res. Lett. 36, doi:10.1029/2009gl041009 (2009).
+3. Nitrogen Deposition data. Reference: i) Lamarque, J. F. et al. Atmos. Chem. Phys. 10, 7017-7039 (2010); ii) Lamarque, J. F. et al. Climatic Change 109, 191-212 (2011).
+4. Phosphorus weathing data. Reference: Wang, Y. P. et al. Biogeosciences 7, 2261-2282, (2010).
+5. Phosphorus deposition data. Reference: i) Mahowald, N. M. in Ecological Systems (ed Rik Leemans) Ch. 2, 7-29 (Springer, 2013); ii) Mahowald, N. et al. Glob. Biogeochem. Cy. GB026 (2008).
+
+Outputs:
+Resampled versions of the input data at 1 degree spatial resolution 
 '''
 from input_raster import input_raster
 import osgeo.gdal as gdal
