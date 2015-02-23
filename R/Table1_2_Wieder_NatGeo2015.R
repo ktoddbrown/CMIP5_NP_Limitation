@@ -12,33 +12,9 @@
 # plots individual model changes over entire time series for NPP, Terrestrail C, k, etc.
 # looks at sensitivity analysis (w/ high land low N/P inputs, CNP ratios)
 
-dir <- "/Users/wwieder/Desktop/Working_files/plant_CUE/cmip5_results/NatGeo_drafts_1/RevisedData/CMIP5_01032015/"
+dir <- "/set_your_directory_here/"
 setwd(dir)
 
-
-#ylab <- list(npp=expression('Pg'~'yr'^-1), veg=expression('Pg'),
-#             soil=expression('Pg'), land=expression('Pg'))
-#minMax <- list(npp=c(-10, 70), veg=c(-350,300), soil=c(-650, 350),
-#               land=c(-600, 600))
-#colList <- list(N=rgb(1,0,0,1), P=rgb(0,1,0,1), NP=rgb(0,0,1,1), org=rgb(0,0,0,0.8))
-titleList <- list(npp='NPP', land='Total Lands Carbon', soil='Soil Carbon', veg='Vegetation Carbon')
-
-#addSoilN <- TRUE
-#for(addSoilN in c(TRUE, FALSE)){
-#pdf(sprintf('GlobalTotSummary%s.pdf', c('withCn', '')[c(addSoilN, !addSoilN)]), height=4*2, width=4*2)
-figList <- list(npp=c(0,0.45, 0, 0.5),
-                nppSup=c(0.3, 0.5, 0, 0.5),
-                veg=c(0, 0.45, 0.5, 1),
-                vegSup=c(0.3, 0.5, 0.5, 1),
-                soil=c(0.5, 0.95, 0, 0.5),
-                soilSup=c(0.8, 1, 0.0, 0.5),
-                land=c(0.5, 0.95, 0.5, 1),
-                landSup=c(0.8, 1, 0.5, 1)
-                )
-
-firstLimit <- TRUE
-
-finalMeans <- list()
 
 # --------------- matrixes to store results----------------------
 
