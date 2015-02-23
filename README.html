@@ -57,14 +57,29 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <p>This code base is associated with Weider et al. Future productivity and carbon storage are limited by terrestrial nutrient availability. Nature Geoscience (2015) and the manuscript should be considered the primary citation.</p>
 <div id="purpose" class="section level2">
 <h2>Purpose</h2>
-<p>The purpose of this code base was to impose a nutrient constraint on the land carbon component of Earth system models from [CMIP5] (<a href="http://cmip-pcmdi.llnl.gov/cmip5/">http://cmip-pcmdi.llnl.gov/cmip5/</a>).</p>
+<p>The purpose of this code base was to impose a nutrient constraint on the land carbon component of Earth system models from CMIP5 (<a href="http://cmip-pcmdi.llnl.gov/cmip5/">http://cmip-pcmdi.llnl.gov/cmip5/</a>).</p>
 <p>This repo does not include any datasets used in this study, primarily because these were not a product of this study and can be obtained elsewhere. Included in this repo are the following primary scripts:</p>
 <ol style="list-style-type: decimal">
-<li>Python/ +NtrInputs_Resampling.py: Generate the nutrient input estimations</li>
-<li>R/ +calcNPPLimit.R: Main script for imposing post hoc nutrient constraints on the land carbon cycle. +Fig1-S7_Wieder_NatGeo2015.R: Generate figures for the manuscript</li>
-<li>NCL/ +Fig2_S2-S5_S8-10_Weider.ncl: Generate figures for the manscript</li>
+<li>Python/</li>
 </ol>
-<p><strong>Attributions</strong>: W. Kolby Smith (<a href="mailto:wkolby@gmail.com">wkolby@gmail.com</a>) processed the nutrient input estimations. Katherine Todd-Brown (<a href="mailto:ktoddbrown@gmail.com">ktoddbrown@gmail.com</a>) processed the CMIP5 simulation outputs. William Wieder (<a href="mailto:wwieder@ucar.edu">wwieder@ucar.edu</a>) developed the visualizations.</p>
+<ul>
+<li>NtrInputs_Resampling.py: Generate the nutrient input estimations</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>R/</li>
+</ol>
+<ul>
+<li>calcNPPLimit.R: Main script for imposing post hoc nutrient constraints on the land carbon cycle.</li>
+<li>Fig1-S7_Wieder_NatGeo2015.R: Generate figures for the manuscript</li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>NCL/</li>
+</ol>
+<ul>
+<li>Fig2_S2-S5_S8-10_Weider.ncl: Generate figures for the manscript</li>
+</ul>
+<p>Earth system model simulation outputs can be downloaded from here: <a href="http://cmip-pcmdi.llnl.gov/cmip5/">http://cmip-pcmdi.llnl.gov/cmip5/</a> and processing scripts are in R/lib.</p>
+<p><strong>Attributions</strong>: W. Kolby Smith (<span class="citation">@wkolby</span> <a href="mailto:wkolby@gmail.com">wkolby@gmail.com</a>) processed the nutrient input estimations. Katherine Todd-Brown (<span class="citation">@ktoddbrown</span> <a href="mailto:ktoddbrown@gmail.com">ktoddbrown@gmail.com</a>) processed the CMIP5 simulation outputs. William Wieder (<span class="citation">@wwieder</span> <a href="mailto:wwieder@ucar.edu">wwieder@ucar.edu</a>) developed the visualizations.</p>
 </div>
 <div id="licence" class="section level2">
 <h2>Licence</h2>
