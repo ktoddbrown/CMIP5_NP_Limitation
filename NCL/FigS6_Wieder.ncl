@@ -21,9 +21,9 @@ begin
  ;-------------------------------------------------------------
  ;-----------------read in .nc files---------------------------
  ;-------------------------------------------------------------
- path     = (/"/project/tss/wwieder/cmip5/"/)
- pathin   = (/path + "CMIP5_01032015/"/)
-
+ path     = (/ "/set_your_working_directory_here/" /)                  ;directory where files are found
+ pathin   = (/ path + "directory_w/_data/" /)                          ;subdirectory w/ CMIP5 model results
+ 
  landpath = (/path + "landarea/Mean_Landarea_1dgr.nc"/)
  NPdata   = (/path + "NPinputs/model_cum_NPbalance.nc"/)
  l        = addfile(NPdata, "r")
