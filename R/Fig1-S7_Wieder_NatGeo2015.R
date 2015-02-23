@@ -6,7 +6,7 @@
 # compares global control pools & fluxes to N limited and NP limited results
 # soil respiration fluxes adjusted to give same NEP & land C sink over 20th Century
 
-dir <- "/Users/wwieder/Desktop/Working_files/plant_CUE/cmip5_results/NatGeo_drafts_1/RevisedData/CMIP5_01032015/"
+dir <- "/set_your_directory_here/"
 setwd(dir)
 
 soilNreturn <- "False" #False for Fig. 1, True for Fig. S7
@@ -19,7 +19,7 @@ annual_EcoC_C  <- matrix(NA, nrow = 252, ncol = 11 )
 annual_EcoC_N  <- matrix(NA, nrow = 252, ncol = 11 )
 annual_EcoC_NP <- matrix(NA, nrow = 252, ncol = 11 )
 
-
+# I manually broke up large .csv file into individual files for each before running this code
 if (soilNreturn == "False") {
 	files <- c('orginalTot.csv', 'N_limitedTot.csv', 'NP_limitedTot.csv')
 } else if (soilNreturn == "True") {
