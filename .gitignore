@@ -8,10 +8,9 @@ CMIP5_NP_Limitation.Rproj
 ##Ignore local files
 data/*
 fig/*
-output/*
-20141206data/*
+R/output/*
+private/*
 
 .RData
-##Kathe’s personal visualizations
-QuickVisuals.Rmd
+
 
