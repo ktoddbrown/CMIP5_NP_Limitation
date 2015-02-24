@@ -1,7 +1,7 @@
 Limiting CMIP5 land carbon cycle with nitrogen and phosphorus post hoc 
 ===================
 
-This code base is associated with Weider et al. Future productivity and carbon storage are limited by terrestrial nutrient availability. Nature Geoscience (2015) and the manuscript should be considered the primary citation.
+This code base is associated with Wieder et al. Future productivity and carbon storage are limited by terrestrial nutrient availability. Nature Geoscience (2015) and the manuscript should be considered the primary citation.
 
 Purpose
 -----------------
