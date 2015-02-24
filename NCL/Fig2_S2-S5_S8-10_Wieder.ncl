@@ -460,6 +460,7 @@ begin
   print("--------npp plots made (Fig. S5) -----")
 ; draw figure 2
 
+  res@cnFillPalette          = "WhBlGrYeRe"
   res@cnMinLevelValF         = 0.
   res@cnMaxLevelValF         = 33
   res@cnLevelSpacingF        = 3
